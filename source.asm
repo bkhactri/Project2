@@ -2,6 +2,7 @@
 	tb1: .asciiz "project2"
 	tb2: .asciiz "tuan da o day"
 	tb3: .asciiz "\n"
+	tb4: .asciiz "\n"
 
 .text
 	li $v0,4
