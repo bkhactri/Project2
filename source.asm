@@ -1,7 +1,7 @@
 .data 
 	tb1: .asciiz "project2"
 	tb2: .asciiz "tuan da o day"
-	tb2: .asciiz "tri da o day"
+	tb3: .asciiz "\n"
 
 .text
 	li $v0,4
