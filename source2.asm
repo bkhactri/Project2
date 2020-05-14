@@ -11,3 +11,22 @@
 	la $a0, tb2
 	syscall
 
+	li $v0,4
+	la $a0,tb1
+	syscall 
+	
+	li $v0, 4
+	la $a0, tb2
+	syscall
+
+
+	li $v0,4
+	la $a0,tb1
+	syscall 
+	
+	li $v0, 4
+	la $a0, tb2
+	syscall
+
+
+
