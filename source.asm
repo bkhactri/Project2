@@ -1,6 +1,10 @@
 .data
 
 #---- Cho nay danh luu thong tin nguoi choi -----#
+	inputNamePlayer: .asciiz "Nhap ten cua ban: "
+	outputWelcome1: .asciiz "\nChao mung "
+	outputWelcome2: .asciiz " den voi HangMan (Tro choi doan chu). Hay co giu lay mang song\n"
+	inputAgain: .asciiz "Ten dang nhap khong dung. Vui long nhap lai!!!\n"
 	Name: .space 100
 	WinCount: .word 0
 	Score: .word 
@@ -47,7 +51,8 @@
 	outputWin: .asciiz "\n*** You win! ***\n"
 	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang."
 	ntfRemainLive: .asciiz "\n<>===<> So mang con lai: "
-
+	
+	
 	
 
 #------ Day la phan luu thong tin ---------#	
@@ -68,7 +73,9 @@
 .text
 	.globl main
 main:
-	#Doc file
+	# Nhap ten nguoi choi
+	jal _NamePlayer
+	# Doc file
 	
 	li $v0,13           	# mo file voi syscall 13
     	la $a0,fileName     	# dia chi file
@@ -168,6 +175,8 @@ _ContinuePlay:
 
 	# Ham doan ki tu
 	jal _GuessCharacter
+	# Thoat
+	j _ExitGame
 # Ham lua chon nhap ki tu hay chuoi
 _Choose:
 	li $v0,4
@@ -575,8 +584,6 @@ OutLost:
 	la $a0, outputLost	
 	syscall 
 
-	li $v0, 10	
-	syscall 
 	j End
 OutWin:
 	#Xuat thong bao thang
@@ -584,8 +591,6 @@ OutWin:
 	la $a0, outputWin	
 	syscall 
 
-	li $v0, 10	
-	syscall
 	j End
 End:
 	# CUoi thu tuc
@@ -602,6 +607,8 @@ End:
 	lw $s1,40($sp)
 	addi $sp,$sp,64
 	jr $ra
+
+
 
 # Nhap dang chuoi
 _GuessString:
@@ -929,7 +936,122 @@ _CreateOutPutStr.Loop:
 
 	addi $sp,$sp,24 #Giai Phong Stack
 	jr $ra
+# Ham nhap ten nguoi choi
+_NamePlayer:
+	#Dau thu tuc
+	addi $sp,$sp,-56 #Khai bao stack
 
+	sw $ra,($sp) #Luu tru so dong de quay tro lai
+	sw $s0,4($sp) 
+	sw $s1,8($sp) 	# < ki tu 0
+	sw $s2,12($sp)	# > ki tu 9
+	sw $s3,16($sp)	# < ki tu A
+	sw $s4,20($sp)	# > ki tu Z
+	sw $s5,24($sp)	# < ki tu a
+	sw $s6,28($sp)	# > ki tu z
+	sw $t1,32($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
+	sw $t2,36($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
+	sw $t3,40($sp)	# So sanh 
+	sw $t4,44($sp)	# Thanh ghi phu
+	sw $t5,48($sp)	# Thanh ghi phu
+	sw $t6,52($sp)	# Thanh ghi phu
+_InputNamePlayer:
+	li $s1, '0'
+	addi $t1, $s1, -1
+	move $s1, $t1
+	li $s2, '9'
+	addi $t2, $s2, 1
+	move $s2, $t2
+	li $s3, 'A'
+	addi $t3, $s3, -1
+	move $s3, $t3
+	li $s4, 'Z'
+	addi $t4, $s4, 1
+	move $s4, $t4
+	li $s5, 'a'
+	addi $t5, $s5, -1
+	move $s5, $t5
+	li $s6, 'z'
+	addi $t6, $s6, 1
+	move $s6, $t6
+	
+	#xuat tb1
+	li $v0,4
+	la $a0,inputNamePlayer
+	syscall
+	#nhap ten
+	li $v0,8
+	la $a0,Name
+	li $a1,100
+	syscall
+
+	li $v0,0
+	la $s0,Name
+_Check:
+	lb $t0,($s0)
+	beq $t0,'\n',_Check.End
+	# Kiem tra dau cach
+	beq $t0,' ',_Check.Continue
+	# Kiem tra so
+	slt $t1,$t0,$s2
+	slt $t2,$s1,$t0
+	add $t3,$t1,$t2
+	beq $t3,2,_Check.Continue
+	# Kiem tra chu hoa
+	slt $t1,$t0,$s4
+	slt $t2,$s3,$t0
+	add $t3,$t1,$t2
+	beq $t3,2,_Check.Continue
+	# Kiem tra chu thuong
+	slt $t1,$t0,$s6
+	slt $t2,$s5,$t0
+	add $t3,$t1,$t2
+	beq $t3,2,_Check.Continue
+	j _InputAgain
+_InputAgain:
+	li $v0,4
+	la $a0,inputAgain
+	syscall
+	j _InputNamePlayer
+
+_Check.Continue:
+	addi $s0,$s0,1
+	j _Check
+_Check.End:
+	li $t0,'\0' 
+	sb $t0,($s0)
+
+	li $v0,4
+	la $a0,outputWelcome1
+	syscall
+	
+	li $v0,4
+	la $a0,Name
+	syscall
+
+	li $v0,4
+	la $a0,outputWelcome2
+	syscall
+# Cuoi thu tuc
+	lw $ra,($sp) #Luu tru so dong de quay tro lai
+	lw $s0,4($sp) 
+	lw $s1,8($sp) 	# < ki tu 0
+	lw $s2,12($sp)	# > ki tu 9
+	lw $s3,16($sp)	# < ki tu A
+	lw $s4,20($sp)	# > ki tu Z
+	lw $s5,24($sp)	# < ki tu a
+	lw $s6,28($sp)	# > ki tu z
+	lw $t1,32($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
+	lw $t2,36($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
+	lw $t3,40($sp)	# So sanh 
+	lw $t4,44($sp)	# Thanh ghi phu
+	lw $t5,48($sp)	# Thanh ghi phu
+	lw $t6,52($sp)	# Thanh ghi phu
+	addi $sp,$sp,56
+	jr $ra
+_ExitGame:
+	li $v0,10
+	syscall
 
 
 
