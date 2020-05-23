@@ -1,6 +1,7 @@
 .data
 
 #---- Cho nay danh luu thong tin nguoi choi -----#
+	InputNameSyscall: .asciiz "Dat ten nhan vat cua ban nao: "
 	Name: .space 100
 	WinCount: .word 0
 	Score: .word 
@@ -68,8 +69,25 @@
 .text
 	.globl main
 main:
-	#Doc file
+	#Xuat thong bao nhap ten
+	li $v0,4
+	la $a0,InputNameSyscall
+	syscall
+	#Nhap ten 
+	li $v0,8
+	la $a0,Name
+	la $a1,100
+	syscall
 	
+	#Truyen tham so vao
+	la $a0,Name
+	#Goi ham kiem tra ten
+	jal _CheckName
+
+
+
+
+	#Doc file
 	li $v0,13           	# mo file voi syscall 13
     	la $a0,fileName     	# dia chi file
     	li $a1,0        	# bat flag len 0 de doc
@@ -885,6 +903,7 @@ _Getword.Lap2:
 	addi $sp, $sp, 64
 	jr $ra
 
+#----- Ham khoi tao chuoi ket qua -----#
 _CreateOutPutStr:
 #Dau thu tuc
 	addi $sp,$sp,-24 #Khai bao stack
@@ -931,6 +950,20 @@ _CreateOutPutStr.Loop:
 	jr $ra
 
 
+#----- Ham kiem tra ten nguoi choi theo dieu kien cho truoc -----#
+_CheckName:
+#Dau thu tuc
+	addi $sp,$sp,-24 #Khai bao stack
+
+	sw $ra,($sp) #Luu tru so dong de quay tro lai
+	sw $t0,4($sp) 
+	sw $t1,8($sp)
+	sw $s0,12($sp)
+	sw $s1,16($sp)
+	sw $s2,20($sp)
+
+#Than thu tuc
+	
 
 
 
