@@ -44,7 +44,7 @@
 	# ====> Nhap dang chuoi
 	inputGuessString: .asciiz "Ban doan dap an la : "
 
-	strCheck:.space 100 #chuoi nhap
+	strCheck:.space 200 #chuoi nhap
 	size: .word 0 #size cua chuoi dap an
 
 	outputExist: .asciiz "\nKi tu nay ban da doan roi  \n"
@@ -53,6 +53,7 @@
 	outputWin: .asciiz "\n*** You win! ***\n"
 	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang."
 	ntfRemainLive: .asciiz "\n<>===<> So mang con lai: "
+	Null: .asciiz "\0"
 	
 	
 	
@@ -76,9 +77,9 @@
 	.globl main
 main:
 	# Nhap ten nguoi choi
-	jal _NamePlayer
+	jal _NamePlayer	
 
-
+ContinuePlay:
 	# Doc file
 	li $v0,13           	# mo file voi syscall 13
     	la $a0,fileName     	# dia chi file
@@ -101,8 +102,6 @@ main:
  	move $a0,$s0      		
     	syscall
 
-
-	
 	# lay so luong tu trong chuoi
 	la $a0, fileWords
 	lw $a1, SizeString
@@ -110,10 +109,6 @@ main:
 	
 	# goi ham lay so luong tu
 	jal _GetSize
-
-
-ContinuePlay:
-	
 
 	#Lay ra tong so de va random tu 1 -> n de lay ra ma de
 	lw $a1, n
@@ -125,7 +120,7 @@ ContinuePlay:
 
 	#luu vao bien ma de
 	sw $a0,MaDe
-	
+
 	# truyen tham so
 	la $a0, fileWords
 	lw $a1, SizeString
@@ -133,7 +128,7 @@ ContinuePlay:
 	lw $a3, MaDe
 	# goi ham lay de
 	jal _Getword
-
+	
 	# truyen tham so
 	lw $a0,SizeWord
 	jal _CreateOutPutStr	
@@ -515,8 +510,8 @@ Condi.Next:
 			addi $t1,$t1,1
 			j FindInArr
 	FindInArr.Out:
-		sub $t3,$t3,$t5
-		sub $t1,$t1,$t5
+		#sub $t3,$t3,$t5
+		#sub $t1,$t1,$t5
 		beq $t7,$0,Lost
 		j Win
 	Lost:
@@ -530,6 +525,7 @@ Condi.Next:
 		beq $t4, 2, _NumIncorrect_5
 		beq $t4, 1, _NumIncorrect_6
 		beq $t4, 0, _NumIncorrect_7
+
 	Lost.Continue:
 		#Xuat thong bao thua
 		li $v0, 4 	
@@ -589,14 +585,14 @@ Condi.Next:
 
 OutLost:
 	#tham chieu vao ham va kiem tra choi tiep hay khong
-	li $a0,1
-	sw $a0,Status
+	li $t0,1
+	sw $t0,Status
 	j EndTurn
 
 OutWin:
 	#tham chieu vao ham va kiem tra choi tiep hay khong
-	li $a0,0
-	sw $a0,Status
+	li $t0,0
+	sw $t0,Status
 	j EndTurn
 
 End:
@@ -642,13 +638,13 @@ GuessString:
 	j _OutLost.String
 
 _OutWin.String:
-	li $a0,1
-	sw $a0,Status
+	li $t0,1
+	sw $t0,Status
 	j EndTurn
 
 _OutLost.String:
-	li $a0,0
-	sw $a0,Status
+	li $t0,0
+	sw $t0,Status
 	j EndTurn
 
 
@@ -790,7 +786,7 @@ _GetSize.End:
 _Getword:
 # dau thu tuc
 	# kiem tra xem
-	addi $sp, $sp, -64
+	addi $sp, $sp, -60
 	sw $ra, ($sp)
 	sw $s0, 4($sp)
 	sw $s1, 8($sp)
@@ -827,8 +823,9 @@ _Getword:
 	jal _GetSize
 	#luu so luong tu vao
 	lw $t3, sl
+
 _Getword.Lap:
-	# luu ky tu
+	# lay ky tu
 	lb $t4, ($s0)
 	# tang bien dem
 	addi $t1, $t1, 1
@@ -837,8 +834,10 @@ _Getword.Lap:
 
 	# tang dia chi
 	addi $s0, $s0, 1
+	addi $s6,$s6,1
 	beq $t4, '*', _Getword.Next
 	j _Getword.Lap
+
 _Getword.Next:
 	addi $t2, $t2, 1
 	# kiem tra neu vi tri cua word khac yeu cau
@@ -872,7 +871,6 @@ _Getword.Lap2:
 	#kiem tra xem i < n
 	blt $t5, $t1, _Getword.Lap2
 	
-
 #cuoi thu tuc
 	lw $ra, ($sp)
 	lw $s0, 4($sp)
@@ -889,7 +887,7 @@ _Getword.Lap2:
 	lw $t5, 48($sp)
 	lb $t6, 52 ($sp)
 	lb $t7, 56($sp)
-	addi $sp, $sp, 64
+	addi $sp, $sp, 60
 	jr $ra
 
 
@@ -1085,7 +1083,26 @@ EndTurn.Lost:
 	j EndTurn.RepeatOrNot
 
 EndTurn.RepeatOrNot:
+	
+	la $a0,fileWords
+	jal _ClearMemory
 
+	la $a0,Word
+	jal _ClearMemory
+
+	la $a0,strCheck
+	jal _ClearMemory
+
+	la $a0,OutputStr
+	jal _ClearMemory
+
+	li $t1,0
+	sw $t1,SizeWord
+	sw $t1,SizeString
+	sw $t1,MaDe
+	sw $t1,sl
+	sw $t1,n
+	
 	#Xuat thong bao choi tiep hay khong
 	li $v0,4
 	la $a0,Replay	
@@ -1095,18 +1112,45 @@ EndTurn.RepeatOrNot:
 	syscall
 
 	move $t0,$v0
-	li $t1,0
-	sb $0,Word
-	sw $t1,SizeWord
-	sw $t1,MaDe
-	sw $t1,sl
-
-
-
-
 	beq $t0,1,ContinuePlay
 	j ExitGame
 
+_ClearMemory:
+
+#Dau thu tuc
+	addi $sp,$sp,-20 #Khai bao stack
+
+	sw $ra,($sp) #Luu tru so dong de quay tro lai
+	sw $t0,4($sp) 
+	sw $t1,8($sp)
+	sw $t2,12($sp)
+	sw $s0,16($sp)
+#Than thu tuc
+	move $s0,$a0
+	lb $t0,Null
+	li $t2,0
+
+_ClearMemory.Loop:
+	lb $t1,($s0)
+	bne $t1,'\0',_ClearMemory.Clear
+	j _ClearMemory.End
+
+_ClearMemory.Clear:
+	sb $t0,	($s0)
+	addi $s0,$s0,1
+	addi $t2,$t2,1
+	j _ClearMemory.Loop
+
+_ClearMemory.End:
+	sub $s0,$s0,$t2
+#Cuoi thu tuc
+	lw $ra,($sp) #Luu tru so dong de quay tro lai
+	lw $t0,4($sp) 
+	lw $t1,8($sp)
+	lw $t2,12($sp)
+	lw $s0,16($sp)
+	addi $sp,$sp,20 #Giai Phong Stack
+	jr $ra
 	
 
 ExitGame:
@@ -1128,11 +1172,11 @@ ExitGame:
 	li $v0,1
 	lw $a0,WinCount
 	syscall
-	li $v0,11
-	la $a0,'-'
-	syscall
+	
 
 
 
 	li $v0,10
 	syscall
+
+
