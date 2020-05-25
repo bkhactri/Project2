@@ -1,4 +1,4 @@
- .data
+.data
 
 #---- Cho nay danh luu thong tin nguoi choi -----#
 	inputNamePlayer: .asciiz "Nhap ten cua ban: "
@@ -180,9 +180,10 @@ ContinuePlay:
 	la $a0, Word	
 	syscall 
 	# Ham doan ki tu
-	jal _GuessCharacter
-	# Thoat
-	j ExitGame
+	jal _GuessChar
+	
+	# Choi lai
+	j EndTurn.RepeatOrNot
 
 # Cho nay lua chon nhap ki tu hay chuoi
 Choose:
@@ -194,11 +195,11 @@ Choose:
 	syscall
 
 	move $s5,$v0
-	beq $s5,1,_inputChar.Continue
+	beq $s5,1,_GuessChar.InputChar.Continue
 	beq $s5,2,GuessString
 	j Choose
 # Sai 0 
-_NumIncorrect_0:
+NumIncorrect_0:
 	# Hien thi gio do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -221,9 +222,9 @@ _NumIncorrect_0:
 	li $v0,4
 	la $a0,shelfBot
 	syscall
-	j Lost.Continue	
+	j _GuessChar.Lost.Continue	
 # Sai 1	
-_NumIncorrect_1:
+NumIncorrect_1:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -246,9 +247,9 @@ _NumIncorrect_1:
 	li $v0,4
 	la $a0,shelfBot
 	syscall
-	j Lost.Continue	
+	j _GuessChar.Lost.Continue	
 # Sai 2
-_NumIncorrect_2:
+NumIncorrect_2:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -271,9 +272,9 @@ _NumIncorrect_2:
 	li $v0,4
 	la $a0,shelfBot
 	syscall
-	j Lost.Continue	
+	j _GuessChar.Lost.Continue	
 # Sai 3	
-_NumIncorrect_3:
+NumIncorrect_3:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -296,9 +297,9 @@ _NumIncorrect_3:
 	li $v0,4
 	la $a0,shelfBot
 	syscall
-	j Lost.Continue	
+	j _GuessChar.Lost.Continue	
 # Sai 4	
-_NumIncorrect_4:
+NumIncorrect_4:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -322,9 +323,9 @@ _NumIncorrect_4:
 	la $a0,shelfBot
 	syscall
 
-	j Lost.Continue	
+	j _GuessChar.Lost.Continue	
 # Sai 5	
-_NumIncorrect_5:
+NumIncorrect_5:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -347,9 +348,9 @@ _NumIncorrect_5:
 	la $a0,shelfBot
 	syscall
 
-	j Lost.Continue		
+	j _GuessChar.Lost.Continue		
 # Sai 6
-_NumIncorrect_6:
+NumIncorrect_6:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -372,9 +373,9 @@ _NumIncorrect_6:
 	li $v0,4
 	la $a0,shelfBot
 	syscall
-	j Lost.Continue	
+	j _GuessChar.Lost.Continue	
 # Sai 7
-_NumIncorrect_7:
+NumIncorrect_7:
 	# Hien thi gia do phia tren
 	li $v0,4
 	la $a0,shelfTop
@@ -397,11 +398,11 @@ _NumIncorrect_7:
 	li $v0,4
 	la $a0,shelfBot
 	syscall
-	j Condi
+	j _GuessChar.Condi
 
 # PHAN XU LY GAME DUOI DAY NE #
 #----- Ham doan ky tu----#
-_GuessCharacter:
+_GuessChar:
 	# Dau thu tuc
 	addi $sp,$sp,-64
 	sw $ra,($sp)
@@ -420,27 +421,27 @@ _GuessCharacter:
 	la $t1,Word
 	lw $t2,SizeWord
 	la $t3,OutputStr
-Condi:	
+_GuessChar.Condi:	
 	#Kiem tra dieu kien chay
-	beq $t4,$0,OutLost
+	beq $t4,$0,_GuessChar.OutLost
 	
 	#Kiem tra chien thang
 	li $t7,'*' # khoi tao *
 
 	move $t5,$0  # khoi tao bien dem
-	j CheckWinLoop
+	j _GuessChar.CheckWinLoop
 
-	CheckWinLoop:
-		beq $t5,$t2,OutWin
+	_GuessChar.CheckWinLoop:
+		beq $t5,$t2,_GuessChar.OutWin
 		lb $t6,($t3)
 
-		beq $t6,$t7,Condi.Next1
+		beq $t6,$t7,_GuessChar.Condi.Next1
 		addi $t5,$t5,1
 		addi $t3,$t3,1
-		j CheckWinLoop
-Condi.Next1:	
+		j _GuessChar.CheckWinLoop
+_GuessChar.Condi.Next1:	
 	j Choose
-_inputChar.Continue:
+_GuessChar.InputChar.Continue:
 	sub $t3,$t3,$t5
 	#Xuat thong bao nhap
 	li $v0, 4 	
@@ -456,18 +457,18 @@ _inputChar.Continue:
 
 	#Kiem tra ki tu vua nhap da tung duoc nhap chua
 	move $t5,$0 
-	j Condi.LoopFind
+	j _GuessChar.Condi.LoopFind
 
-	Condi.LoopFind:
-		beq $t5,$t2,Condi.Out.True
+	_GuessChar.Condi.LoopFind:
+		beq $t5,$t2,_GuessChar.Condi.Out.True
 		lb $t6,($t3)	
 
-		beq $t6,$t0,Condi.Out.False
+		beq $t6,$t0,_GuessChar.Condi.Out.False
 		addi $t5,$t5,1
 		addi $t3,$t3,1
-		j Condi.LoopFind
+		j _GuessChar.Condi.LoopFind
 
-	Condi.Out.False:
+	_GuessChar.Condi.Out.False:
 		sub $t3,$t3,$t5
 
 		#Xuat thong bao ton tai
@@ -475,14 +476,14 @@ _inputChar.Continue:
 		la $a0, outputExist	
 		syscall 
 
-		j Condi
+		j _GuessChar.Condi
 
-	Condi.Out.True:
+	_GuessChar.Condi.Out.True:
 		sub $t3,$t3,$t5
 
-		j Condi.Next
+		j _GuessChar.Condi.Next
 
-Condi.Next:
+_GuessChar.Condi.Next:
 	#Flag gan bang 0
 	move $t7,$0
 	#Khoi tao thanh ghi dem = 0
@@ -490,43 +491,43 @@ Condi.Next:
 	#$s0 phan tu mang da
 	#$s1 phan tu mang doi chung
 	#Tim vi tri ki tu nhap vao
-	j FindInArr
+	j _GuessChar.FindInArr
 
-	FindInArr:
-		beq $t5, $t2,FindInArr.Out
+	_GuessChar.FindInArr:
+		beq $t5, $t2,_GuessChar.FindInArr.Out
 		lb $s0,($t1)
 		lb $s1,($t3)
 
-		beq $s0,$t0,FindInArr.ChangeOutputStr
-		j FindInArr.NChangeOutputStr
+		beq $s0,$t0,_GuessChar.FindInArr.ChangeOutputStr
+		j _GuessChar.FindInArr.NChangeOutputStr
 
-		FindInArr.ChangeOutputStr:
+		_GuessChar.FindInArr.ChangeOutputStr:
 			sb $t0,($t3)
 			addi $t7,$t7,1
-			j FindInArr.NChangeOutputStr
-		FindInArr.NChangeOutputStr:
+			j _GuessChar.FindInArr.NChangeOutputStr
+		_GuessChar.FindInArr.NChangeOutputStr:
 			addi $t5,$t5,1
 			addi $t3,$t3,1
 			addi $t1,$t1,1
-			j FindInArr
-	FindInArr.Out:
+			j _GuessChar.FindInArr
+	_GuessChar.FindInArr.Out:
 		sub $t3,$t3,$t5
 		sub $t1,$t1,$t5
-		beq $t7,$0,Lost
-		j Win
-	Lost:
+		beq $t7,$0,_GuessChar.Lost
+		j _GuessChar.Win
+	_GuessChar.Lost:
 		#so mang tru 1
 		addi $t4, $t4, -1
 		# Kiem tra so lan sai va xuat giao dien
-		beq $t4, 6, _NumIncorrect_1
-		beq $t4, 5, _NumIncorrect_2
-		beq $t4, 4, _NumIncorrect_3
-		beq $t4, 3, _NumIncorrect_4
-		beq $t4, 2, _NumIncorrect_5
-		beq $t4, 1, _NumIncorrect_6
-		beq $t4, 0, _NumIncorrect_7
+		beq $t4, 6, NumIncorrect_1
+		beq $t4, 5, NumIncorrect_2
+		beq $t4, 4, NumIncorrect_3
+		beq $t4, 3, NumIncorrect_4
+		beq $t4, 2, NumIncorrect_5
+		beq $t4, 1, NumIncorrect_6
+		beq $t4, 0, NumIncorrect_7
 
-	Lost.Continue:
+	_GuessChar.Lost.Continue:
 		#Xuat thong bao thua
 		li $v0, 4 	
 		la $a0, notExist	
@@ -553,9 +554,9 @@ Condi.Next:
 		li $v0, 4 	
 		la $a0, downLine	
 		syscall 
-		j Condi
+		j _GuessChar.Condi
 
-	Win:
+	_GuessChar.Win:
 		# Thong bao so mang con lai
 		li $v0,4
 		la $a0,ntfRemainLive
@@ -581,17 +582,17 @@ Condi.Next:
 		li $v0, 4 	
 		la $a0, downLine	
 		syscall 
-		j Condi
+		j _GuessChar.Condi
 
-OutLost:
+_GuessChar.OutLost:
 	#tham chieu vao ham va kiem tra choi tiep hay khong
-	li $t0,1
+	li $t0,0
 	sw $t0,Status
 	j EndTurn
 
-OutWin:
+_GuessChar.OutWin:
 	#tham chieu vao ham va kiem tra choi tiep hay khong
-	li $t0,0
+	li $t0,1
 	sw $t0,Status
 	j EndTurn
 
@@ -938,7 +939,6 @@ _CreateOutPutStr.Loop:
 	addi $sp,$sp,24 #Giai Phong Stack
 	jr $ra
 
-
 #----- Ham nhap ten nguoi choi va kiem tra -----#
 _NamePlayer:
 	#Dau thu tuc
@@ -958,7 +958,7 @@ _NamePlayer:
 	sw $t4,44($sp)	# Thanh ghi phu
 	sw $t5,48($sp)	# Thanh ghi phu
 	sw $t6,52($sp)	# Thanh ghi phu
-_InputNamePlayer:
+_NamePlayer.Input:
 	li $s1, '0'
 	addi $t1, $s1, -1
 	move $s1, $t1
@@ -990,37 +990,40 @@ _InputNamePlayer:
 
 	li $v0,0
 	la $s0,Name
-_Check:
+_NamePlayer.Check:
 	lb $t0,($s0)
-	beq $t0,'\n',_Check.End
+	# Kiem tra vi tri ket thuc
+	beq $t0,'\n',_NamePlayer.CheckEnd
 	# Kiem tra dau cach
-	beq $t0,' ',_Check.Continue
+	beq $t0,' ',_NamePlayer.CheckContinue
 	# Kiem tra so
 	slt $t1,$t0,$s2
 	slt $t2,$s1,$t0
 	add $t3,$t1,$t2
-	beq $t3,2,_Check.Continue
+	beq $t3,2,_NamePlayer.CheckContinue
 	# Kiem tra chu hoa
 	slt $t1,$t0,$s4
 	slt $t2,$s3,$t0
 	add $t3,$t1,$t2
-	beq $t3,2,_Check.Continue
+	beq $t3,2,_NamePlayer.CheckContinue
 	# Kiem tra chu thuong
 	slt $t1,$t0,$s6
 	slt $t2,$s5,$t0
 	add $t3,$t1,$t2
-	beq $t3,2,_Check.Continue
-	j _InputAgain
-_InputAgain:
+	beq $t3,2,_NamePlayer.CheckContinue
+	j _NamePlayer.InputAgain
+
+_NamePlayer.InputAgain:
 	li $v0,4
 	la $a0,inputAgain
 	syscall
-	j _InputNamePlayer
+	j _NamePlayer.Input
 
-_Check.Continue:
+_NamePlayer.CheckContinue:
 	addi $s0,$s0,1
-	j _Check
-_Check.End:
+	j _NamePlayer.Check
+
+_NamePlayer.CheckEnd:
 	li $t0,'\0' 
 	sb $t0,($s0)
 
@@ -1053,6 +1056,7 @@ _Check.End:
 	addi $sp,$sp,56
 	jr $ra
 
+
 #----- Cho nay xuat thang thua va dieu khien huong ctrinh sau khi ket thuc luot choi -----#
 EndTurn:
 	lw $t0,Status
@@ -1073,15 +1077,14 @@ EndTurn.Win:
 	lw $t2,WinCount
 	addi $t2,$t2,1
 	sw $t2,WinCount
-		
-	j EndTurn.RepeatOrNot
+	j End
 
 EndTurn.Lost:
 	#Xuat thong bao thua
 	li $v0,4
 	la $a0,outputLost	
 	syscall
-	j EndTurn.RepeatOrNot
+	j End
 
 EndTurn.RepeatOrNot:
 
@@ -1094,6 +1097,7 @@ EndTurn.RepeatOrNot:
 	la $a0,OutputStr
 	jal _ClearMemory
 
+	# Load lai de moi
 	li $t1,0
 	sw $t1,SizeWord
 	sw $t1,MaDe
@@ -1107,12 +1111,10 @@ EndTurn.RepeatOrNot:
 	li $v0,5
 	syscall
 
-	move $t0,$v0
-	beq $t0,1,ContinuePlay
+	beq $v0,1,ContinuePlay
 	j ExitGame
 
 _ClearMemory:
-
 #Dau thu tuc
 	addi $sp,$sp,-20 #Khai bao stack
 	sw $ra,($sp) #Luu tru so dong de quay tro lai
@@ -1146,7 +1148,6 @@ _ClearMemory.End:
 	addi $sp,$sp,20 #Giai Phong Stack
 	jr $ra
 	
-
 ExitGame:
 	#Xuat ten
 	li $v0,4
@@ -1166,11 +1167,6 @@ ExitGame:
 	li $v0,1
 	lw $a0,WinCount
 	syscall
-	
-
-
 
 	li $v0,10
 	syscall
-
-
