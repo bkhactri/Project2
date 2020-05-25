@@ -52,9 +52,8 @@
 	outputLost: .asciiz "\n*** You lost! ***\n"
 	outputWin: .asciiz "\n*** You win! ***\n"
 	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang."
-	ntfRemainLive: .asciiz "\n<>===<> So mang con lai: "
-	Null: .asciiz "\0"
-	
+	ntfRemainLive: .asciiz "\n<HP>So mang con lai: "
+	Zero: .asciiz "0"
 	
 	
 
@@ -79,7 +78,7 @@ main:
 	# Nhap ten nguoi choi
 	jal _NamePlayer	
 
-ContinuePlay:
+
 	# Doc file
 	li $v0,13           	# mo file voi syscall 13
     	la $a0,fileName     	# dia chi file
@@ -110,12 +109,13 @@ ContinuePlay:
 	# goi ham lay so luong tu
 	jal _GetSize
 
+ContinuePlay:
+
 	#Lay ra tong so de va random tu 1 -> n de lay ra ma de
 	lw $a1, n
    	li $v0, 42  #random
     	syscall
    	
-	#li $a0,0
 	addi $a0,$a0,1	
 
 	#luu vao bien ma de
@@ -510,8 +510,8 @@ Condi.Next:
 			addi $t1,$t1,1
 			j FindInArr
 	FindInArr.Out:
-		#sub $t3,$t3,$t5
-		#sub $t1,$t1,$t5
+		sub $t3,$t3,$t5
+		sub $t1,$t1,$t5
 		beq $t7,$0,Lost
 		j Win
 	Lost:
@@ -871,6 +871,7 @@ _Getword.Lap2:
 	#kiem tra xem i < n
 	blt $t5, $t1, _Getword.Lap2
 	
+
 #cuoi thu tuc
 	lw $ra, ($sp)
 	lw $s0, 4($sp)
@@ -924,7 +925,7 @@ _CreateOutPutStr.Loop:
 	blt $t0,$s0,_CreateOutPutStr.Loop
 	#Gan ky tu ket thuc chuoi
 	sb $0,($s1)
-	
+	sub $s1,$s1,$t0
 	
 #Cuoi thu tuc
 	lw $ra,($sp) #Luu tru so dong de quay tro lai
@@ -1083,9 +1084,6 @@ EndTurn.Lost:
 	j EndTurn.RepeatOrNot
 
 EndTurn.RepeatOrNot:
-	
-	la $a0,fileWords
-	jal _ClearMemory
 
 	la $a0,Word
 	jal _ClearMemory
@@ -1098,10 +1096,8 @@ EndTurn.RepeatOrNot:
 
 	li $t1,0
 	sw $t1,SizeWord
-	sw $t1,SizeString
 	sw $t1,MaDe
-	sw $t1,sl
-	sw $t1,n
+
 	
 	#Xuat thong bao choi tiep hay khong
 	li $v0,4
@@ -1119,7 +1115,6 @@ _ClearMemory:
 
 #Dau thu tuc
 	addi $sp,$sp,-20 #Khai bao stack
-
 	sw $ra,($sp) #Luu tru so dong de quay tro lai
 	sw $t0,4($sp) 
 	sw $t1,8($sp)
@@ -1127,9 +1122,8 @@ _ClearMemory:
 	sw $s0,16($sp)
 #Than thu tuc
 	move $s0,$a0
-	lb $t0,Null
+	lb $t0,Zero
 	li $t2,0
-
 _ClearMemory.Loop:
 	lb $t1,($s0)
 	bne $t1,'\0',_ClearMemory.Clear
