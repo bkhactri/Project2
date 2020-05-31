@@ -469,7 +469,7 @@ NumIncorrect_7:
 #----- Ham doan ky tu----#
 _GuessChar:
 	# Dau thu tuc
-	addi $sp,$sp,-64
+	addi $sp,$sp,-44
 	sw $ra,($sp)
 	sw $t0,4($sp)
 	sw $t1,8($sp)
@@ -682,7 +682,7 @@ End:
 	lw $t7,32($sp)
 	lw $s0,36($sp)
 	lw $s1,40($sp)
-	addi $sp,$sp,64
+	addi $sp,$sp,44
 	jr $ra
 
 
@@ -812,7 +812,7 @@ _KiemTraCaChuoi.KhongBang:
 #----- Ham lay size cua dap an -----#
 _GetSize:
 # dau thu tuc
-	addi $sp, $sp, -64
+	addi $sp, $sp, -40
 	sw $ra, ($sp)
 	sw $s0, 4($sp)
 	sw $s2, 12($sp)
@@ -850,7 +850,7 @@ _GetSize.End:
 	lw $t0, 28($sp)
 	lb $t1, 32($sp)
 	lw $t2, 36($sp)
-	addi $sp, $sp, 64
+	addi $sp, $sp, 40
 	jr $ra
 
 #----- Ham lay dap an tu file -----#
@@ -1012,7 +1012,7 @@ _CreateOutPutStr.Loop:
 #----- Ham nhap ten nguoi choi va kiem tra -----#
 _NamePlayer:
 	#Dau thu tuc
-	addi $sp,$sp,-56 #Khai bao stack
+	addi $sp,$sp,-60 #Khai bao stack
 
 	sw $ra,($sp) #Luu tru so dong de quay tro lai
 	sw $s0,4($sp) 
@@ -1022,12 +1022,13 @@ _NamePlayer:
 	sw $s4,20($sp)	# > ki tu Z
 	sw $s5,24($sp)	# < ki tu a
 	sw $s6,28($sp)	# > ki tu z
-	sw $t1,32($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
-	sw $t2,36($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
-	sw $t3,40($sp)	# So sanh 
-	sw $t4,44($sp)	# Thanh ghi phu
-	sw $t5,48($sp)	# Thanh ghi phu
-	sw $t6,52($sp)	# Thanh ghi phu
+	sb $t0,32($sp)	# lay ki tu vi tri i
+	sw $t1,36($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
+	sw $t2,40($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
+	sw $t3,44($sp)	# So sanh 
+	sw $t4,48($sp)	# Thanh ghi phu
+	sw $t5,52($sp)	# Thanh ghi phu
+	sw $t6,56($sp)	# Thanh ghi phu
 _NamePlayer.Input:
 	li $s1, '0'
 	addi $t1, $s1, -1
@@ -1111,19 +1112,20 @@ _NamePlayer.CheckEnd:
 # Cuoi thu tuc
 	lw $ra,($sp) #Luu tru so dong de quay tro lai
 	lw $s0,4($sp) 
-	lw $s1,8($sp) 	# < ki tu 0
-	lw $s2,12($sp)	# > ki tu 9
-	lw $s3,16($sp)	# < ki tu A
-	lw $s4,20($sp)	# > ki tu Z
-	lw $s5,24($sp)	# < ki tu a
-	lw $s6,28($sp)	# > ki tu z
-	lw $t1,32($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
-	lw $t2,36($sp)	# Kiem tra ki tu --> tra ve 0 hoac 1
-	lw $t3,40($sp)	# So sanh 
-	lw $t4,44($sp)	# Thanh ghi phu
-	lw $t5,48($sp)	# Thanh ghi phu
-	lw $t6,52($sp)	# Thanh ghi phu
-	addi $sp,$sp,56
+	lw $s1,8($sp) 	
+	lw $s2,12($sp)	
+	lw $s3,16($sp)	
+	lw $s4,20($sp)	
+	lw $s5,24($sp)
+	lw $s6,28($sp)
+	lb $t0,32($sp)
+	lw $t1,36($sp)
+	lw $t2,40($sp)
+	lw $t3,44($sp)
+	lw $t4,48($sp)
+	lw $t5,52($sp)
+	lw $t6,56($sp)
+	addi $sp,$sp,60
 	jr $ra
 
 
@@ -1369,7 +1371,7 @@ _SizeNum.Lap:
 _LinkProfile:
 #dau thu tuc
 	# dau thu tuc
-	addi $sp, $sp, -64
+	addi $sp, $sp, -60
 	sw $ra, ($sp)
 	sw $s0, 4($sp)
 	sw $s1, 8($sp)
@@ -1482,13 +1484,13 @@ _LinkProfile.So:
 	lb $t5, 48($sp)
 	lb $t6, 52 ($sp)
 	lw $t7, 56($sp)
-	addi $sp, $sp, 64
+	addi $sp, $sp, 60
 	jr $ra
 
 #---- Ham doc file -----#
 _ReadProfile:
 # dau thu tuc
-	addi $sp, $sp, -64
+	addi $sp, $sp, -16
 	sw $ra, ($sp)
 	sw $s0, 4($sp)
 	sw $s1, 8($sp)
