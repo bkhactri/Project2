@@ -218,7 +218,7 @@ ContinuePlay:
 	la $a0, downLine	
 	syscall 
 	
-	#Dap an de test                            (Test xong xoa cho nay di nha)
+	#Dap an de test ne                           (Test xong xoa cho nay di nha)
 	li $v0, 4 	
 	la $a0, Word	
 	syscall 
