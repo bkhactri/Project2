@@ -538,12 +538,30 @@ _GuessChar.InputChar.Continue:
 
 	_GuessChar.Condi.Out.False:
 		sub $t3,$t3,$t5
-
+		#Xuat xuong dong
+		li $v0, 4 	
+		la $a0, downLine	
+		syscall
+		#Khung tren
+		li $v0,4
+		la $a0,frame	
+		syscall
+		#Xuat thong bao ket qua
+		li $v0, 4 	
+		la $a0, CheckWarning	
+		syscall 
 		#Xuat thong bao ton tai
 		li $v0, 4 	
 		la $a0, outputExist	
 		syscall 
-
+		#Xuat xuong dong
+		li $v0, 4 	
+		la $a0, downLine	
+		syscall
+		#Khung duoi
+		li $v0,4
+		la $a0,frame	
+		syscall 
 		j _GuessChar.Condi
 
 	_GuessChar.Condi.Out.True:
