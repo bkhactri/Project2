@@ -41,11 +41,13 @@
 
 	Game: .asciiz "           _-^-_ HANGMAN _-^-_" 
 	inputChoose: .asciiz "  ==  Lua chon cach doan cua ban  ==\n1. Doan ki tu \n2. Doan chuoi \nLua chon cua ban: "
+	StartWarning: .asciiz "\nTU KHOA DANH CHO BAN LA: "
 	Warning : .asciiz "\nCAP NHAT TU KHOA : "
 	Replay : .asciiz "\n1.Choi lai \n2.Thoat \nLua chon cua ban: "
 	Result : .asciiz "Thanh tich cua ban (ten-diem-so lan thang): "
 	Top: .asciiz "Top 10 nguoi choi : \n"
 	TheBest: .asciiz "Ban da pha bang tro choi \n"
+	GuessTrue: .asciiz "\nBan da doan dung"
 	# ====> Nhap dang ky tu
 	inputGuessChar: .asciiz "Ban doan ky tu la : "
 	# ====> Nhap dang chuoi
@@ -58,7 +60,8 @@
 	downLine: .asciiz "\n"
 	outputLost: .asciiz "\n       ******** You lost! ********\n\n"
 	outputWin: .asciiz"\n       ******** You win! ********\n\n"
-	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang."
+	CheckWarning: .asciiz"\nKET QUA:"
+	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang. Hay chac chan hon voi lua chon cua minh"
 	ntfRemainLive: .asciiz "\n<HP>So mang con lai: "
 	NULL: .asciiz "\0"
 
@@ -206,7 +209,7 @@ ContinuePlay:
 	
 	#Xuat de              
 	li $v0,4
-	la $a0,Warning
+	la $a0,StartWarning
 	syscall
 	
 	li $v0,4
@@ -219,9 +222,9 @@ ContinuePlay:
 	syscall 
 	
 	#Dap an de test ne                           (Test xong xoa cho nay di nha)
-	li $v0, 4 	
-	la $a0, Word	
-	syscall 
+	#li $v0, 4 	
+	#la $a0, Word	
+	#syscall 
 
 	# Ham doan ki tu
 	jal _GuessChar
@@ -583,6 +586,22 @@ _GuessChar.Condi.Next:
 	_GuessChar.Lost:
 		#so mang tru 1
 		addi $t4, $t4, -1
+		#Xuat xuong dong
+		li $v0, 4 	
+		la $a0, downLine	
+		syscall
+		#Khung tren
+		li $v0,4
+		la $a0,frame	
+		syscall
+		#Xuat thong bao ket qua
+		li $v0, 4 	
+		la $a0, CheckWarning	
+		syscall 
+		#Xuat thong bao thua
+		li $v0, 4 	
+		la $a0, notExist	
+		syscall 
 		# Kiem tra so lan sai va xuat giao dien
 		beq $t4, 6, NumIncorrect_1
 		beq $t4, 5, NumIncorrect_2
@@ -593,11 +612,6 @@ _GuessChar.Condi.Next:
 		beq $t4, 0, NumIncorrect_7
 
 	_GuessChar.Lost.Continue:
-		#Xuat thong bao thua
-		li $v0, 4 	
-		la $a0, notExist	
-		syscall 
-		
 		# Thong bao so mang con lai
 		li $v0,4
 		la $a0,ntfRemainLive
@@ -609,7 +623,10 @@ _GuessChar.Condi.Next:
 		li $v0, 4 	
 		la $a0, downLine	
 		syscall 
-
+		#Xuat thong bao cap nhat chuoi
+		li $v0, 4 	
+		la $a0, Warning
+		syscall 
 		#Xuat chuoi outputstr
 		li $v0, 4 	
 		move $a0, $t3	
@@ -626,6 +643,22 @@ _GuessChar.Condi.Next:
 		j _GuessChar.Condi
 
 	_GuessChar.Win:
+		#Xuat xuong dong
+		li $v0, 4 	
+		la $a0, downLine	
+		syscall
+		#Khung tren
+		li $v0,4
+		la $a0,frame	
+		syscall
+		#Xuat thong bao ket qua
+		li $v0, 4 	
+		la $a0, CheckWarning	
+		syscall
+		#Xuat thong bao doan sai
+		li $v0,4
+		la $a0,GuessTrue
+		syscall
 		# Thong bao so mang con lai
 		li $v0,4
 		la $a0,ntfRemainLive
