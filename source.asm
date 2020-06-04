@@ -82,20 +82,20 @@
 	SizeString: .word 0 
 	sl: .word 0
 	n: .word 0 #So luong de
-	ID: .word 0
-	IDExist : .space 400
-	IDcount :.word 0
+	ID: .word 0 #Ma de
+	IDExist : .space 400 #Mang de da ra
+	IDcount :.word 0 #So luong de da ra
 #--- Phan nay la nguoi choi -----#
 	sizearr: .word 0
 	sizepro: .word 0
 	arr: .space 2048
-	fileAllName: .space 2048
-	temp : .space 200
+	fileAllName: .space 2048 #Tat ca du lieu cua file nguoichoi.txt
+	temp : .space 200 #Trong day chua du lieu tam de xuat top 10
 
 #--- Phan nay la ord diem nguoi choi -----#
-	PointArr: .space 500
-	IndexArr: .space 500
-	SizePoints: .word 0
+	PointArr: .space 500 #Mang diem cua nguoi choi
+	IndexArr: .space 500 #Mang vi tri tuong duong voi diem cua nguoi choi
+	SizePoints: .word 0 #So luong diem nguoi choi doc duoc
 	
 	
 .text
@@ -235,7 +235,7 @@ ContinuePlay:
 	# Choi lai hoac thoat
 	j EndTurn.RepeatOrNot
 
-Refresh:
+Refresh: #Lam sach bo nho
 	la $a0,Word
 	jal _ClearMemory
 
@@ -1358,6 +1358,7 @@ _ClearMemory:
 	sw $t2,12($sp)
 	sw $s0,16($sp)
 #Than thu tuc
+	#Luu dia chi bien can xoa bo nho
 	move $s0,$a0
 	lb $t0,NULL
 	li $t2,0
@@ -1847,11 +1848,14 @@ _Sort:
 	
 #Than thu tuc
 
-	#Lay dia chi mang
+	#Lay dia chi mang diem
 	move $s0,$a0
+	#Lay dia chi them 1 lan
 	move $s1,$a0
 
+	#Lay dia chi mang index
 	move $s4,$a1
+	#Lay dia chi them 1 lan
 	move $s5,$a1
 
 	#lay gia tri n
@@ -1938,7 +1942,7 @@ _Sort.Skip:
 	jr $ra
 
 
-#==== HAM XUAT MANG
+#==== HAM TEST XUAT MANG =====#
 #Dau thu tuc
 XuatMang:
 	addi $sp,$sp,-16 #khai bao stack
@@ -2123,13 +2127,13 @@ _CheckFreq:
 	lw $s1,($a1) #so luong ma de ra choi
 	lw $s2,($a2) #ID
 	
-	beq,$s1,0,_CheckFreq.NotExist1
+	beq,$s1,0,_CheckFreq.NotExist1#Neu so luong de da ra = 0 thi no chua xuat hien
 	#khoi tao vong lap
 	li $t0,0
 
 _CheckFreq.Loop:
 	lw $t1,($s0)
-	beq $s2,$t1,_CheckFreq.Exist
+	beq $s2,$t1,_CheckFreq.Exist #Neu bang thi ton tai
 	addi $s0,$s0,4
 	addi $t0,$t0,1
 	blt $t0,$s1,_CheckFreq.Loop
@@ -2137,14 +2141,14 @@ _CheckFreq.Loop:
 
 _CheckFreq.Exist:
 	
-	li $v0,1
+	li $v0,1#Ton tai tra ve 1 de kiem tra ben ngoai
 	j _CheckFreq.End
 
 _CheckFreq.NotExist1:
-	addi $t0,$t0,1
-	sw $t0,($a1)
-	sw $s2,($s0)
-	li $v0,0
+	addi $t0,$t0,1 
+	sw $t0,($a1)#Cap nhat so luong de da ra
+	sw $s2,($s0)#Cap nhat de vao mang de da ra
+	li $v0,0#Khong Ton tai tra ve 0 de kiem tra ben ngoai
 
 _CheckFreq.End:
 	
@@ -2161,6 +2165,7 @@ _CheckFreq.End:
 	#Tra ve
 	jr $ra
 
+#Thoat game
 ExitGame:
 	li $v0,10
 	syscall
