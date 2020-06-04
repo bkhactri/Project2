@@ -46,7 +46,7 @@
 	Replay : .asciiz "\n1.Choi lai \n2.Thoat \nLua chon cua ban: "
 	Result : .asciiz "Thanh tich cua ban (ten-diem-so lan thang): "
 	Top: .asciiz "Top 10 nguoi choi : \n"
-	TheBest: .asciiz "Ban da pha bang tro choi \n"
+	TheBest: .asciiz "Ban da chien thang tro choi \n"
 	GuessTrue: .asciiz "\nBan da doan dung"
 	# ====> Nhap dang ky tu
 	inputGuessChar: .asciiz "Ban doan ky tu la : "
