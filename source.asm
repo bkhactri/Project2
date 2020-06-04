@@ -61,7 +61,7 @@
 	outputLost: .asciiz "\n       ******** You lost! ********\n\n"
 	outputWin: .asciiz"\n       ******** You win! ********\n\n"
 	CheckWarning: .asciiz"\nKET QUA:"
-	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang. Hay chac chan hon voi lua chon cua minh"
+	notExist: .asciiz "\nKi tu khong ton tai. Ban mat 1 mang."
 	ntfRemainLive: .asciiz "\n<HP>So mang con lai: "
 	NULL: .asciiz "\0"
 
